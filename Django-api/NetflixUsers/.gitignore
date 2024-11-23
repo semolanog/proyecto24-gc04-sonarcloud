@@ -1,0 +1,19 @@
+# Ignore the virtual environment
+.venv/
+
+# Ignore system and development temporary files
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Ignore editor-specific configuration files
+.vscode/
+.idea/
+*.swp
+
+# Ignore log files and pending migrations
+*.log
+*.bak
+
+# Ignore Python configuration files
+.env
