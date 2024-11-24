@@ -4,7 +4,7 @@
 
 To configure and run this project on your computer, you need the following installed:
 * **Python 3.13 or higher**: Download it from [python.org](https://www.python.org/downloads/).
-* **Git**: To clone the [project repository](https://github.com/UExGPSASEE/proyecto24-gc04.git).
+* **Git**: To clone the project repository [project repository](https://github.com/UExGPSASEE/proyecto24-gc04.git).
 * **Development Environment**: Using Visual Studio Code is recommended. You can download it from [code.visualstudio.com](https://code.visualstudio.com/).
 
 ## Initial Setup
