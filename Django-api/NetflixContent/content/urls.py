@@ -32,7 +32,9 @@ urlpatterns = [
     ),
     path(
         "series/<int:id>/",
-        SeriesViewSet.as_view({"get": "retrieve", "put": "update"}),
+        SeriesViewSet.as_view({
+            "get": "retrieve", "put": "update", "delete": "destroy"
+        }),
         name="series-detail"
     )
 ]
