@@ -7,6 +7,7 @@ import {
 } from "reactstrap";
 
 const Series = () => {
+  const [series, setSeries] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [formData, setFormData] = useState({
@@ -27,7 +28,9 @@ const Series = () => {
 
   useEffect(() => {
     document.title = "Series";
-
+    axios.get('http://127.0.0.1:8000/series/')
+      .then(response => setSeries(response.data))
+      .catch(error => console.error("Error fetching series:", error));
 
     axios.get('http://127.0.0.1:8000/genres/')
       .then(response => setGenres(response.data))
@@ -84,6 +87,7 @@ const Series = () => {
       },
     })
       .then(response => {
+        setSeries(prev => [...prev, response.data]);
         setFormData({
           description: "",
           directors: "",
@@ -254,6 +258,10 @@ const Series = () => {
             </form>
           </>
         ) : null}
+
+        <div className="series-container">
+          {series.map(serie => <SerieCard key={serie.id} serie={serie} />)}
+        </div>
       </div>
     </>
   );

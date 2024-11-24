@@ -87,6 +87,15 @@ class RatingOrderedContentViewSet(viewsets.ModelViewSet):
     serializer_class = None
     watched_contents_url = None
 
+    def list(self, request):
+        search = request.query_params.get("search")
+        filters &= get_search_filter(search)
+        filtered_contents = self.queryset.filter(filters).distinct().order_by(
+            "-rating", "title"
+        )
+        serializer = self.serializer_class(filtered_contents, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class MovieViewSet(RatingOrderedContentViewSet):
     content_name = "Movie"
