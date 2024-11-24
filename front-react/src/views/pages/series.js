@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 // reactstrap components
+import {
+  Button,
+} from "reactstrap";
 
 const Series = () => {
   const [searchResults, setSearchResults] = useState([]);
@@ -24,6 +27,7 @@ const Series = () => {
 
   useEffect(() => {
     document.title = "Series";
+
 
     axios.get('http://127.0.0.1:8000/genres/')
       .then(response => setGenres(response.data))
@@ -108,6 +112,41 @@ const Series = () => {
   };
 
   const SerieCard = ({ serie }) => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const [watched, setWatched] = useState(false);
+
+    useEffect(() => {
+      if (user) {
+        axios.get(`http://127.0.0.1:8002/watched-series/?user_id=${user.id}&series_id=${serie.id}`)
+          .then(response => {
+            setWatched(response.data.length > 0);
+          })
+          .catch(error => console.error("Error fetching watched status:", error));
+      }
+    }, [user, serie.id]);
+
+    const toggleWatchedStatus = () => {
+      const url = `http://127.0.0.1:8002/watched-series/`;
+      const method = watched ? 'delete' : 'post';
+      const data = watched ? {} : { user_id: user.id, series_id: serie.id };
+
+      axios({
+        method,
+        url: watched ? `${url}?user_id=${user.id}&series_id=${serie.id}` : url,
+        data,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      })
+        .then(() => {
+          setWatched(!watched);
+        })
+        .catch(error => {
+          console.error(`Error ${watched ? 'unmarking' : 'marking'} series as watched:`, error.response ? error.response.data : error);
+        });
+    };
+
     return (
       <div key={serie.id} className="series-card">
         <h3>{serie.title}</h3>
@@ -120,6 +159,9 @@ const Series = () => {
         <p><strong>Release Date:</strong> {serie.release_date}</p>
         <p><strong>Seasons:</strong> {serie.seasons}</p>
         <p><strong>Thumbnail:</strong> <a href={serie.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+        <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
+              {watched ? "Desmarcar serie" : "Ver serie"}
+        </Button>
       </div>
     );
   };

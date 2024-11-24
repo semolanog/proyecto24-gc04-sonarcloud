@@ -117,6 +117,41 @@ const Peliculas = () => {
   };
 
   const PeliculaCard = ({ pelicula }) => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const [watched, setWatched] = useState(false);
+
+    useEffect(() => {
+      if (user) {
+        axios.get(`http://127.0.0.1:8002/watched-movies/?user_id=${user.id}&movie_id=${pelicula.id}`)
+          .then(response => {
+            setWatched(response.data.length > 0);
+          })
+          .catch(error => console.error("Error fetching watched status:", error.response ? error.response.data : error));
+      }
+    }, [user, pelicula.id]);
+
+    const toggleWatchedStatus = () => {
+      const url = `http://127.0.0.1:8002/watched-movies/`;
+      const method = watched ? 'delete' : 'post';
+      const data = watched ? {} : { user_id: user.id, movie_id: pelicula.id };
+    
+      axios({
+        method,
+        url: watched ? `${url}?user_id=${user.id}&movie_id=${pelicula.id}` : url,
+        data,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      })
+        .then(() => {
+          setWatched(!watched);
+        })
+        .catch(error => {
+          console.error(`Error ${watched ? 'unmarking' : 'marking'} movie as watched:`, error.response ? error.response.data : error);
+        });
+    };
+
     return (
       <div key={pelicula.id} className="series-card">
         <h3 style={{color: 'darkred', fontWeight: 'bold'}}>{pelicula.title}</h3>
@@ -128,6 +163,9 @@ const Peliculas = () => {
         <p><strong>Rating:</strong> {pelicula.rating}</p>
         <p><strong>Release Date:</strong> {pelicula.release_date}</p>
         <p><strong>Thumbnail:</strong> <a href={pelicula.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+        <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
+              {watched ? "Desmarcar pelicula" : "Ver pelicula"}
+        </Button>
       </div>
     );
   };
