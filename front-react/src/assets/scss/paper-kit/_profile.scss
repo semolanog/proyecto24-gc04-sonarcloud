@@ -1,0 +1,118 @@
+/* Profile.css */
+
+/* Contenedor principal */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: center;
+  margin: 50px auto;
+  max-width: 600px;
+  margin-top: 200px;
+}
+
+/* Sección del perfil */
+.profile-card {
+  background: #f9f9f9;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+h1 {
+  font-weight: bold;
+  color: darkred;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  margin-bottom: 10px;
+  font-size: 18px; /* Aumentado desde 16px */
+  line-height: 1.5; /* Mejor espacio entre líneas */
+  color: #333; /* Mayor contraste */
+}
+
+/* Botones */
+.profile-button,
+.user-delete-button {
+  background: transparent;
+  border: 2px solid darkred;
+  color: darkred;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.profile-button:hover,
+.user-delete-button:hover {
+  background: darkred;
+  color: #fff;
+}
+
+/* Lista de usuarios */
+.user-list {
+  background: #f9f9f9;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  font-weight: bold;
+  font-size: 16px; /* Ajuste para claridad */
+}
+
+.user-list h2 {
+  font-weight: bold;
+  color: darkred;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.user-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.user-list span {
+  font-weight: bold;
+}
+
+/* Inputs en modo edición */
+.profile-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+
+
+/* Estilo simple y mejorado para el checkbox */
+.profile-input[type="checkbox"] {
+  width: 20px; /* Tamaño del checkbox */
+  height: 20px;
+  accent-color: darkred; /* Cambia el color del checkbox */
+  cursor: pointer; /* Añade un puntero para indicar que es clicable */
+  border: 1px solid #ccc; /* Añade un pequeño borde */
+  border-radius: 4px; /* Esquinas ligeramente redondeadas */
+  transition: box-shadow 0.2s ease-in-out; /* Animación sutil */
+}
+
+.profile-input[type="checkbox"]:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Efecto al pasar el mouse */
+}
+
+label {
+  display: block; /* Asegura que esté en una línea separada */
+  margin-bottom: 10px; /* Espaciado abajo del label */
+}
