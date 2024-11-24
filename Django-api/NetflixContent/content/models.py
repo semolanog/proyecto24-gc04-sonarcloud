@@ -51,6 +51,46 @@ class Content(models.Model):
         abstract = True
 
 
+class Episode(Content):
+    duration = models.PositiveIntegerField(
+        help_text="The total runtime of the content, in minutes."
+    )
+    episode_number = models.PositiveIntegerField(
+        help_text="The episode's number within its season."
+    )
+    season_number = models.PositiveIntegerField(
+        help_text="The season number to which the episode belongs."
+    )
+    series_id = models.ForeignKey(
+        "Series",
+        help_text="The id of the series the episode belongs to.",
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = "Episode"
+        verbose_name_plural = "Episodes"
+
+    def __str__(self):
+        return f"Episode(id={self.id})"
+
+
+class Movie(Content):
+    duration = models.PositiveIntegerField(
+        help_text="The total runtime of the movie, in minutes."
+    )
+    thumbnail_url = models.URLField(
+        help_text="The URL of the thumbnail image representing the movie."
+    )
+
+    class Meta:
+        verbose_name = "Movie"
+        verbose_name_plural = "Movies"
+
+    def __str__(self):
+        return f"Movie(id={self.id})"
+
+
 class Series(Content):
     end_date = models.DateField(
         blank=True,

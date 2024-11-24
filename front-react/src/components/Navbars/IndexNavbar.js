@@ -85,8 +85,14 @@ function IndexNavbar() {
           isOpen={navbarCollapse}
         >
           <Nav navbar>
+          <NavItem >
+            <NavLink style={{ color: 'darkred' }} href="/peliculas">Movies</NavLink>
+          </NavItem>
           <NavItem>
             <NavLink style={{ color: 'darkred' }} href="/series">Series</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink style={{ color: 'darkred' }} href="/episodios">Episodes</NavLink>
           </NavItem>
           <NavItem>
             <NavLink style={{ color: 'darkred' }} href="/index">Logout</NavLink>

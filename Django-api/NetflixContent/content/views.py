@@ -2,12 +2,15 @@ from django.db.models import Q
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from .models import Genre, Series
-from .serializers import GenreSerializer, SeriesSerializer
+from .models import Episode, Genre, Movie, Series
+from .serializers import (
+    EpisodeSerializer, GenreSerializer, MovieSerializer, SeriesSerializer
+)
 import requests
 
 
 USERS_URL = "http://127.0.0.1:8001/users/"
+WATCHED_MOVIES_URL = "http://127.0.0.1:8002/watched-movies/"
 WATCHED_SERIES_URL = "http://127.0.0.1:8002/watched-series/"
 
 
@@ -31,6 +34,12 @@ def get_users_data():
         )
     users = response.json()
     return users
+
+
+class EpisodeViewSet(viewsets.ModelViewSet):
+    lookup_field = "id"
+    queryset = Episode.objects.all()
+    serializer_class = EpisodeSerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -77,6 +86,16 @@ class RatingOrderedContentViewSet(viewsets.ModelViewSet):
     queryset = None
     serializer_class = None
     watched_contents_url = None
+
+
+class MovieViewSet(RatingOrderedContentViewSet):
+    content_name = "Movie"
+    contents_name = "Movies"
+    id_key = "movie_id"
+    lookup_field = "id"
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    watched_contents_url = WATCHED_MOVIES_URL
 
 
 class SeriesViewSet(RatingOrderedContentViewSet):
