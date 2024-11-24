@@ -5,8 +5,13 @@ from .views import EpisodeViewSet, GenreViewSet, MovieViewSet, SeriesViewSet
 urlpatterns = [
     path(
         "episodes/",
-        EpisodeViewSet.as_view({"post": "create"}),
+        EpisodeViewSet.as_view({"get": "list", "post": "create"}),
         name="episode-list"
+    ),
+    path(
+        "episodes/<int:id>/",
+        EpisodeViewSet.as_view({"get": "retrieve"}),
+        name="episode-detail"
     ),
     path(
         "genres/",
@@ -22,8 +27,13 @@ urlpatterns = [
     ),
     path(
         "movies/",
-        MovieViewSet.as_view({"post": "create"}),
+        MovieViewSet.as_view({"get": "list", "post": "create"}),
         name="movie-list"
+    ),
+    path(
+        "movies/<int:id>/",
+        MovieViewSet.as_view({"get": "retrieve"}),
+        name="movie-detail"
     ),
     path(
         "series/",
