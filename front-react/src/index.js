@@ -10,6 +10,7 @@ import "assets/scss/paper-kit.scss?v=1.3.0";
 import Index from "views/pages/Index.js";
 import IndexInicio from "views/pages/Index-Inicio.js";
 import Registro from "views/pages/Registro.js";
+import Series from "views/pages/series.js";
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -21,6 +22,7 @@ root.render(
       <Route path="/index-inicio" element={<IndexInicio />} />
       <Route path="*" element={<Navigate to="/index" replace />} />
       <Route path="/registro" element={<Registro />} />
+      <Route path="/series" element={<Series />} /> 
 
     </Routes>
   </BrowserRouter>
