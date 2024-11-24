@@ -10,7 +10,7 @@ urlpatterns = [
     ),
     path(
         "episodes/<int:id>/",
-        EpisodeViewSet.as_view({"get": "retrieve"}),
+        EpisodeViewSet.as_view({"get": "retrieve", "put": "update"}),
         name="episode-detail"
     ),
     path(
@@ -32,7 +32,7 @@ urlpatterns = [
     ),
     path(
         "movies/<int:id>/",
-        MovieViewSet.as_view({"get": "retrieve"}),
+        MovieViewSet.as_view({"get": "retrieve", "put": "update"}),
         name="movie-detail"
     ),
     path(

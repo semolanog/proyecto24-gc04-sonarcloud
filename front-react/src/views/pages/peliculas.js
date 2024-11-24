@@ -21,6 +21,8 @@ const Peliculas = () => {
     thumbnail_url: "",
     title: ""
   });
+  const [editMode, setEditMode] = useState(false);
+  const [currentPeliculaId, setCurrentPeliculaId] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -81,8 +83,8 @@ const Peliculas = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const method = 'post';
-    const url = 'http://127.0.0.1:8000/movies/';
+    const method = editMode ? 'put' : 'post';
+    const url = editMode ? `http://127.0.0.1:8000/movies/${currentPeliculaId}/` : 'http://127.0.0.1:8000/movies/';
 
     axios({
       method,
@@ -94,7 +96,8 @@ const Peliculas = () => {
       },
     })
       .then(response => {
-        setPeliculas(prev => [...prev, response.data]);
+        setPeliculas(prev => editMode ? prev.map(p => p.id === currentPeliculaId ? response.data : p) : [...prev, response.data]);
+        setEditMode(false);
         setFormData({
           description: "",
           directors: "",
@@ -110,6 +113,22 @@ const Peliculas = () => {
       .catch(error => {
         console.error("Error saving pelicula:", error.response ? error.response.data : error);
       });
+  };
+
+  const handleEdit = (pelicula) => {
+    setFormData({
+      description: pelicula.description || "",
+      directors: pelicula.directors || "",
+      duration: pelicula.duration || "",
+      genre_ids: pelicula.genre_ids || [],
+      main_actors: pelicula.main_actors || "",
+      rating: pelicula.rating || "",
+      release_date: pelicula.release_date || "",
+      thumbnail_url: pelicula.thumbnail_url || "",
+      title: pelicula.title || ""
+    });
+    setEditMode(true);
+    setCurrentPeliculaId(pelicula.id);
   };
 
   const getGenreNames = (genreIds) => {
@@ -166,6 +185,13 @@ const Peliculas = () => {
         <p><strong>Rating:</strong> {pelicula.rating}</p>
         <p><strong>Release Date:</strong> {pelicula.release_date}</p>
         <p><strong>Thumbnail:</strong> <a href={pelicula.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+        {isAdmin && (
+          <>
+            <Button className="btn-round ml-1" color="info" type="button" onClick={() => handleEdit(pelicula)}>
+              Editar
+            </Button>
+          </>
+        )}
         <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
               {watched ? "Desmarcar pelicula" : "Ver pelicula"}
         </Button>
