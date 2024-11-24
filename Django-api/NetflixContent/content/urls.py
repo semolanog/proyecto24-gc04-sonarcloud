@@ -27,7 +27,12 @@ urlpatterns = [
     ),
     path(
         "series/",
-        SeriesViewSet.as_view({"post": "create"}),
+        SeriesViewSet.as_view({"get": "list", "post": "create"}),
         name="series-list"
+    ),
+    path(
+        "series/<int:id>/",
+        SeriesViewSet.as_view({"get": "retrieve"}),
+        name="series-detail"
     )
 ]
