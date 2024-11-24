@@ -49,7 +49,7 @@ function Registro() {
     })
       .then(() => {
         console.log("User registered successfully");
-        navigate("/index-inicio"); 
+        navigate("/index"); 
       })
       .catch((error) => {
         console.error("Error registering:", error.response ? error.response.data : error);

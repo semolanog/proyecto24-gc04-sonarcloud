@@ -86,7 +86,7 @@ function IndexNavbar() {
         >
           <Nav navbar>
           <NavItem>
-            <NavLink style={{ color: 'darkred' }} href="/registro">Register</NavLink>
+            <NavLink style={{ color: 'darkred' }} href="/index">Logout</NavLink>
           </NavItem>
           </Nav>
         </Collapse>
