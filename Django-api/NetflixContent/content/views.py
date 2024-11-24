@@ -47,10 +47,50 @@ def destroy_related_watched_contents(content_name, contents_name, contents_url):
             )
 
 
+def get_episode_number_filter(episode_number):
+    if not episode_number:
+        return Q()
+    try:
+        episode_number = int(episode_number)
+    except ValueError:
+        raise ValidationError({
+            "episode_number": "A valid integer is required."
+        })
+    return Q(episode_number=episode_number)
+
+
 def get_search_filter(search):
     if not search:
         return Q()
     return Q(title__icontains=search)
+
+
+def get_season_number_filter(season_number):
+    if not season_number:
+        return Q()
+    try:
+        season_number = int(season_number)
+    except ValueError:
+        raise ValidationError({
+            "season_number": "A valid integer is required."
+        })
+    return Q(season_number=season_number)
+
+
+def get_series_id_filter(series_id):
+    if not series_id:
+        return Q()
+    try:
+        series_id = int(series_id)
+    except ValueError:
+        raise ValidationError({
+            "series_id": "A valid integer is required."
+        })
+    if not Series.objects.filter(id=series_id).exists():
+        raise ValidationError({
+            "series_id": f"Invalid pk \"{series_id}\" - object does not exist."
+        })
+    return Q(series_id=series_id)
 
 
 def get_users_data():
@@ -73,6 +113,21 @@ class EpisodeViewSet(viewsets.ModelViewSet):
     lookup_field = "id"
     queryset = Episode.objects.all()
     serializer_class = EpisodeSerializer
+
+    def list(self, request):
+        episode_number = request.query_params.get("episode_number")
+        filters = get_episode_number_filter(episode_number)
+        search = request.query_params.get("search")
+        filters &= get_search_filter(search)
+        season_number = request.query_params.get("season_number")
+        filters &= get_season_number_filter(season_number)
+        series_id = request.query_params.get("series_id")
+        filters &= get_series_id_filter(series_id)
+        filtered_episodes = self.queryset.filter(filters).distinct().order_by(
+            "series_id", "season_number", "episode_number"
+        )
+        serializer = self.serializer_class(filtered_episodes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GenreViewSet(viewsets.ModelViewSet):

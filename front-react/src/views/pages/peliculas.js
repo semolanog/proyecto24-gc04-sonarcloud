@@ -7,6 +7,7 @@ import {
 } from "reactstrap";
 
 const Peliculas = () => {
+  const [peliculas, setPeliculas] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [formData, setFormData] = useState({
@@ -28,6 +29,7 @@ const Peliculas = () => {
     axios.get('http://127.0.0.1:8000/movies/')
       .then(response => {
         console.log("Fetched movies:", response.data); // Debugging log
+        setPeliculas(response.data);
       })
       .catch(error => console.error("Error fetching movies:", error));
 
@@ -92,6 +94,7 @@ const Peliculas = () => {
       },
     })
       .then(response => {
+        setPeliculas(prev => [...prev, response.data]);
         setFormData({
           description: "",
           directors: "",
@@ -246,6 +249,9 @@ const Peliculas = () => {
             </form>
           </>
         ) : null}
+        <div className="series-container">
+          {peliculas.map(pelicula => <PeliculaCard key={pelicula.id} pelicula={pelicula} />)}
+        </div>
       </div>
     </>
   );
