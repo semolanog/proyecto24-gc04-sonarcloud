@@ -25,6 +25,8 @@ const Episodes = () => {
     season_number: "",
     series_id: "",
   });
+  const [editMode, setEditMode] = useState(false);
+  const [currentEpisodeId, setCurrentEpisodeId] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -79,8 +81,8 @@ const Episodes = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const method = 'post';
-    const url = 'http://127.0.0.1:8000/episodes/';
+    const method = editMode ? 'put' : 'post';
+    const url = editMode ? `http://127.0.0.1:8000/episodes/${currentEpisodeId}/` : 'http://127.0.0.1:8000/episodes/';
 
     axios({
       method,
@@ -92,7 +94,8 @@ const Episodes = () => {
       },
     })
       .then(response => {
-        setEpisodes(prev => [...prev, response.data]);
+        setEpisodes(prev => editMode ? prev.map(p => p.id === currentEpisodeId ? response.data : p) : [...prev, response.data]);
+        setEditMode(false);
         setFormData({
           description: "",
           directors: "",
@@ -113,6 +116,24 @@ const Episodes = () => {
       });
   };
 
+  const handleEdit = (episode) => {
+    setFormData({
+      description: episode.description || "",
+      directors: episode.directors || "",
+      genre_ids: episode.genre_ids || [],
+      main_actors: episode.main_actors || "",
+      rating: episode.rating || "",
+      release_date: episode.release_date || "",
+      thumbnail_url: episode.thumbnail_url || "",
+      title: episode.title || "",
+      duration: episode.duration || "",
+      episode_number: episode.episode_number || "",
+      season_number: episode.season_number || "",
+      series_id: episode.series_id || ""
+    });
+    setEditMode(true);
+    setCurrentEpisodeId(episode.id);
+  };
 
 
   const getGenreNames = (genreIds) => {
@@ -177,6 +198,13 @@ const Episodes = () => {
         <p><strong>Season Number:</strong> {episode.season_number}</p>
         <p><strong>Series Title:</strong> {getSeriesTitle(episode.series_id)}</p>
         <p><strong>Thumbnail:</strong> <a href={episode.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+        {isAdmin && (
+          <>
+            <Button className="btn-round ml-1" color="info" type="button" onClick={() => handleEdit(episode)}>
+              Editar
+            </Button>
+          </>
+        )}
         <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
               {watched ? "Desmarcar episodio" : "Ver episodio"}
         </Button>
@@ -273,7 +301,7 @@ const Episodes = () => {
                   ))}
                 </select>
               </div>
-              <button type="submit">{"Create"} episode</button>
+              <button type="submit">{editMode ? "Update" : "Create"} episode</button>
             </form>
           </>
         ) : null}
