@@ -60,6 +60,13 @@ def get_episode_number_filter(episode_number):
     return Q(episode_number=episode_number)
 
 
+def get_genre_filter(genre_ids):
+    if not genre_ids:
+        return Q()
+    genre_ids = validate_genre_ids(genre_ids)
+    return Q(genre_ids__id__in=genre_ids)
+
+
 def get_search_filter(search):
     if not search:
         return Q()
@@ -110,6 +117,27 @@ def get_users_data():
     return users
 
 
+def validate_genre_ids(genre_ids):
+    try:
+        genre_ids = set(int(genre_id) for genre_id in genre_ids.split(","))
+    except ValueError:
+        raise ValidationError({
+            "genre_ids": "A valid list of integers is required."
+        })
+    valid_genre_ids = set(
+        Genre.objects.filter(id__in=genre_ids).values_list("id", flat=True)
+    )
+    invalid_genre_ids = genre_ids - valid_genre_ids
+    if invalid_genre_ids:
+        raise ValidationError({
+            "genre_ids": [
+                f"Invalid pk \"{invalid_genre_id}\" - object does not exist."
+                for invalid_genre_id in invalid_genre_ids
+            ]
+        })
+    return genre_ids
+
+
 class EpisodeViewSet(viewsets.ModelViewSet):
     lookup_field = "id"
     queryset = Episode.objects.all()
@@ -118,6 +146,8 @@ class EpisodeViewSet(viewsets.ModelViewSet):
     def list(self, request):
         episode_number = request.query_params.get("episode_number")
         filters = get_episode_number_filter(episode_number)
+        genre_ids = request.query_params.get("genre_ids")
+        filters &= get_genre_filter(genre_ids)
         search = request.query_params.get("search")
         filters &= get_search_filter(search)
         season_number = request.query_params.get("season_number")
@@ -182,6 +212,8 @@ class RatingOrderedContentViewSet(viewsets.ModelViewSet):
     watched_contents_url = None
 
     def list(self, request):
+        genre_ids = request.query_params.get("genre_ids")
+        filters = get_genre_filter(genre_ids)
         search = request.query_params.get("search")
         filters &= get_search_filter(search)
         filtered_contents = self.queryset.filter(filters).distinct().order_by(

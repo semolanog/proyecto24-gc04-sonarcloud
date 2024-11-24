@@ -9,6 +9,7 @@ import {
 const Episodes = () => {
   const [episodes, setEpisodes] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const [genreSearchResults, setGenreSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [series, setSeries] = useState([]);
   const [formData, setFormData] = useState({
@@ -77,6 +78,12 @@ const Episodes = () => {
     axios.get(`http://127.0.0.1:8000/episodes/?search=${searchQuery}`)
       .then(response => setSearchResults(response.data))
       .catch(error => console.error("Error searching episodes:", error));
+  };
+
+  const handleGenreSearch = (genreId) => {
+    axios.get(`http://127.0.0.1:8000/episodes/?genre_ids=${genreId}`)
+      .then(response => setGenreSearchResults(response.data))
+      .catch(error => console.error("Error searching episodes by genre:", error));
   };
 
   const handleSubmit = (e) => {
@@ -251,6 +258,17 @@ const Episodes = () => {
         </div>
         <div className="series-container">
           {searchResults.map(episode => <EpisodeCard key={episode.id} episode={episode} />)}
+        </div>
+        <h3>Search by genre</h3>
+        <div className="series-container">
+          {genres.map(genre => (
+            <Button style={{border: '2px solid #000'}} className="btn-round ml-1" color="info" type="button" key={genre.id} onClick={() => handleGenreSearch(genre.id)}>
+              {genre.name}
+            </Button>
+          ))}
+        </div>
+        <div className="series-container">
+          {genreSearchResults.map(episode => <EpisodeCard key={episode.id} episode={episode} />)}
         </div>
 
         {isAdmin ? (
