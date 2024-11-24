@@ -23,6 +23,8 @@ const Series = () => {
     thumbnail_url: "",
     title: ""
   });
+  const [editMode, setEditMode] = useState(false);
+  const [currentSerieId, setCurrentSerieId] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -74,8 +76,8 @@ const Series = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const method = 'post';
-    const url = 'http://127.0.0.1:8000/series/';
+    const method = editMode ? 'put' : 'post';
+    const url = editMode ? `http://127.0.0.1:8000/series/${currentSerieId}/` : 'http://127.0.0.1:8000/series/';
 
     axios({
       method,
@@ -87,7 +89,8 @@ const Series = () => {
       },
     })
       .then(response => {
-        setSeries(prev => [...prev, response.data]);
+        setSeries(prev => editMode ? prev.map(p => p.id === currentSerieId ? response.data : p) : [...prev, response.data]);
+        setEditMode(false);
         setFormData({
           description: "",
           directors: "",
@@ -105,6 +108,24 @@ const Series = () => {
       .catch(error => {
         console.error("Error saving serie:", error.response ? error.response.data : error);
       });
+  };
+
+  const handleEdit = (serie) => {
+    setFormData({
+      description: serie.description || "",
+      directors: serie.directors || "",
+      duration: serie.duration || "",
+      episode_average_duration: serie.episode_average_duration || "",
+      genre_ids: serie.genre_ids || [],
+      main_actors: serie.main_actors || "",
+      rating: serie.rating || "",
+      release_date: serie.release_date || "",
+      seasons: serie.seasons || "",
+      thumbnail_url: serie.thumbnail_url || "",
+      title: serie.title || ""
+    });
+    setEditMode(true);
+    setCurrentSerieId(serie.id);
   };
 
 
@@ -163,6 +184,14 @@ const Series = () => {
         <p><strong>Release Date:</strong> {serie.release_date}</p>
         <p><strong>Seasons:</strong> {serie.seasons}</p>
         <p><strong>Thumbnail:</strong> <a href={serie.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+        {isAdmin && (
+          <>
+            <Button className="btn-round ml-1" color="info" type="button" onClick={() => handleEdit(serie)}>
+              Editar
+            </Button>
+
+          </>
+        )}
         <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
               {watched ? "Desmarcar serie" : "Ver serie"}
         </Button>
@@ -254,7 +283,7 @@ const Series = () => {
                   ))}
                 </select>
               </div>
-              <button type="submit" className="submit-button">{"Create"} serie</button>
+              <button type="submit" className="submit-button">{editMode ? "Update" : "Create"} serie</button>
             </form>
           </>
         ) : null}
