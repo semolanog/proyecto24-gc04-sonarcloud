@@ -10,6 +10,7 @@ import requests
 
 
 USERS_URL = "http://127.0.0.1:8001/users/"
+WATCHED_EPISODES_URL = "http://127.0.0.1:8002/watched-episodes/"
 WATCHED_MOVIES_URL = "http://127.0.0.1:8002/watched-movies/"
 WATCHED_SERIES_URL = "http://127.0.0.1:8002/watched-series/"
 
@@ -128,6 +129,11 @@ class EpisodeViewSet(viewsets.ModelViewSet):
         )
         serializer = self.serializer_class(filtered_episodes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        url = f"{WATCHED_EPISODES_URL}?episode_id={self.get_object().id}"
+        destroy_related_watched_contents("Episode", "Episodes", url)
+        return super().destroy(request, *args, **kwargs)
 
 
 class GenreViewSet(viewsets.ModelViewSet):

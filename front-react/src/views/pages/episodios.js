@@ -135,6 +135,15 @@ const Episodes = () => {
     setCurrentEpisodeId(episode.id);
   };
 
+  const handleDelete = (episodeId) => {
+    axios.delete(`http://127.0.0.1:8000/episodes/${episodeId}/`)
+      .then(() => {
+        setEpisodes(prev => prev.filter(p => p.id !== episodeId));
+      })
+      .catch(error => {
+        console.error("Error deleting user:", error.response ? error.response.data : error);
+      });
+  };
 
   const getGenreNames = (genreIds) => {
     return genreIds.map(id => {
@@ -203,6 +212,10 @@ const Episodes = () => {
             <Button className="btn-round ml-1" color="info" type="button" onClick={() => handleEdit(episode)}>
               Editar
             </Button>
+            <Button className="btn-round mr-1" color="danger" type="button" onClick={() => handleDelete(episode.id)}>
+              Eliminar
+            </Button>
+
           </>
         )}
         <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
