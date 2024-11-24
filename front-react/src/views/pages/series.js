@@ -9,6 +9,7 @@ import {
 const Series = () => {
   const [series, setSeries] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const [genreSearchResults, setGenreSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [formData, setFormData] = useState({
     description: "",
@@ -73,6 +74,11 @@ const Series = () => {
       .catch(error => console.error("Error searching series:", error));
   };
 
+  const handleGenreSearch = (genreId) => {
+    axios.get(`http://127.0.0.1:8000/series/?genre_ids=${genreId}`)
+      .then(response => setGenreSearchResults(response.data))
+      .catch(error => console.error("Error searching series by genre:", error));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -237,6 +243,17 @@ const Series = () => {
         </div>
         <div className="series-container">
           {searchResults.map(serie => <SerieCard key={serie.id} serie={serie} />)}
+        </div>
+        <h3>Search by genre</h3>
+        <div className="series-container">
+          {genres.map(genre => (
+            <Button style={{border: '2px solid #000'}} className="btn-round ml-1" color="info" type="button" key={genre.id} onClick={() => handleGenreSearch(genre.id)}>
+              {genre.name}
+            </Button>
+          ))}
+        </div>
+        <div className="series-container">
+          {genreSearchResults.map(serie => <SerieCard key={serie.id} serie={serie} />)}
         </div>
 
         {isAdmin ? (
