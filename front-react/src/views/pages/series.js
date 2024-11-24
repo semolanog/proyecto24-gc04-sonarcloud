@@ -4,6 +4,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 // reactstrap components
 
 const Series = () => {
+  const [searchResults, setSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [formData, setFormData] = useState({
     description: "",
@@ -19,6 +20,7 @@ const Series = () => {
     title: ""
   });
   const [isAdmin, setIsAdmin] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     document.title = "Series";
@@ -52,6 +54,15 @@ const Series = () => {
     setFormData({ ...formData, genre_ids: selectedGenres });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearch = () => {
+    axios.get(`http://127.0.0.1:8000/series/?search=${searchQuery}`)
+      .then(response => setSearchResults(response.data))
+      .catch(error => console.error("Error searching series:", error));
+  };
 
 
   const handleSubmit = (e) => {
@@ -88,6 +99,31 @@ const Series = () => {
       });
   };
 
+
+  const getGenreNames = (genreIds) => {
+    return genreIds.map(id => {
+      const genre = genres.find(g => g.id === id);
+      return genre ? genre.name : "Unknown";
+    }).join(', ');
+  };
+
+  const SerieCard = ({ serie }) => {
+    return (
+      <div key={serie.id} className="series-card">
+        <h3>{serie.title}</h3>
+        <p><strong>Description:</strong> {serie.description}</p>
+        <p><strong>Directors:</strong> {serie.directors}</p>
+        <p><strong>Average Episode Duration:</strong> {serie.episode_average_duration ? serie.episode_average_duration + ' minutes' : 'N/A'}</p>
+        <p><strong>Genres:</strong> {getGenreNames(serie.genre_ids)}</p>
+        <p><strong>Main Actors:</strong> {serie.main_actors}</p>
+        <p><strong>Rating:</strong> {serie.rating}</p>
+        <p><strong>Release Date:</strong> {serie.release_date}</p>
+        <p><strong>Seasons:</strong> {serie.seasons}</p>
+        <p><strong>Thumbnail:</strong> <a href={serie.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+      </div>
+    );
+  };
+
   return (
     <>
       <IndexNavbar />
@@ -103,8 +139,18 @@ const Series = () => {
         }}>
         <div>
           <h1 style={{ fontWeight: "bold" , color: 'darkred'}}>Series</h1>
+          <h3>Search by title</h3>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search serie"
+          />
+          <button onClick={handleSearch}>Search</button>
         </div>
- 
+        <div className="series-container">
+          {searchResults.map(serie => <SerieCard key={serie.id} serie={serie} />)}
+        </div>
 
         {isAdmin ? (
           <>

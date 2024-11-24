@@ -7,6 +7,7 @@ import {
 } from "reactstrap";
 
 const Peliculas = () => {
+  const [searchResults, setSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [formData, setFormData] = useState({
     description: "",
@@ -20,6 +21,7 @@ const Peliculas = () => {
     title: ""
   });
   const [isAdmin, setIsAdmin] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     document.title = "Movies";
@@ -61,6 +63,19 @@ const Peliculas = () => {
     setFormData({ ...formData, genre_ids: selectedGenres });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearch = () => {
+    axios.get(`http://127.0.0.1:8000/movies/?search=${searchQuery}`)
+      .then(response => {
+        console.log("Search results:", response.data); // Debugging log
+        setSearchResults(response.data);
+      })
+      .catch(error => console.error("Error searching peliculas:", error));
+  };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -94,6 +109,29 @@ const Peliculas = () => {
       });
   };
 
+  const getGenreNames = (genreIds) => {
+    return genreIds.map(id => {
+      const genre = genres.find(g => g.id === id);
+      return genre ? genre.name : "Unknown";
+    }).join(', ');
+  };
+
+  const PeliculaCard = ({ pelicula }) => {
+    return (
+      <div key={pelicula.id} className="series-card">
+        <h3 style={{color: 'darkred', fontWeight: 'bold'}}>{pelicula.title}</h3>
+        <p><strong>Description:</strong> {pelicula.description}</p>
+        <p><strong>Directors:</strong> {pelicula.directors}</p>
+        <p><strong>Duration:</strong> {pelicula.duration} minutes</p>
+        <p><strong>Genres:</strong> {getGenreNames(pelicula.genre_ids)}</p>
+        <p><strong>Main Actors:</strong> {pelicula.main_actors}</p>
+        <p><strong>Rating:</strong> {pelicula.rating}</p>
+        <p><strong>Release Date:</strong> {pelicula.release_date}</p>
+        <p><strong>Thumbnail:</strong> <a href={pelicula.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+      </div>
+    );
+  };
+
   return (
     <>
       <IndexNavbar />
@@ -109,6 +147,17 @@ const Peliculas = () => {
         }}>
         <div>
           <h1 style={{ fontWeight: "bold" , color: 'darkred'}} >Movies</h1>
+          <h3>Search by title</h3>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search movie"
+          />
+          <button onClick={handleSearch}>Search</button>
+        </div>
+        <div className="series-container">
+          {searchResults.map(pelicula => <PeliculaCard key={pelicula.id} pelicula={pelicula} />)}
         </div>
 
         {isAdmin ? (
