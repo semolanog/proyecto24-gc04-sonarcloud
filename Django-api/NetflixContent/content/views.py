@@ -14,6 +14,39 @@ WATCHED_MOVIES_URL = "http://127.0.0.1:8002/watched-movies/"
 WATCHED_SERIES_URL = "http://127.0.0.1:8002/watched-series/"
 
 
+def destroy_related_watched_contents(content_name, contents_name, contents_url):
+    try:
+        response = requests.get(contents_url)
+    except requests.RequestException as e:
+        raise ValidationError(
+            f"Error retrieving Watched{contents_name} "
+            f"from {contents_url}: {str(e)}."
+        )
+    if response.status_code != status.HTTP_200_OK:
+        raise ValidationError(
+            f"Error retrieving Watched{contents_name} "
+            f"from {contents_url}. Status code: {response.status_code}."
+        )
+    watched_contents_to_destroy = response.json()
+    for watched_content_to_destroy in watched_contents_to_destroy:
+        watched_content_to_destroy_url = (
+            f"{contents_url}&user_id={watched_content_to_destroy['user_id']}"
+        )
+        try:
+            response = requests.delete(watched_content_to_destroy_url)
+        except requests.RequestException as e:
+            raise ValidationError(
+                f"Error deleting Watched{content_name} at "
+                f"{watched_content_to_destroy_url}: {str(e)}."
+            )
+        if response.status_code != status.HTTP_204_NO_CONTENT:
+            raise ValidationError(
+                f"Error deleting Watched{content_name} at "
+                f"{watched_content_to_destroy_url}. "
+                f"Status code: {response.status_code}."
+            )
+
+
 def get_search_filter(search):
     if not search:
         return Q()
@@ -95,6 +128,11 @@ class RatingOrderedContentViewSet(viewsets.ModelViewSet):
         )
         serializer = self.serializer_class(filtered_contents, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        url = f"{self.watched_contents_url}?{self.id_key}={self.get_object().id}"
+        destroy_related_watched_contents(self.content_name, self.contents_name, url)
+        return super().destroy(request, *args, **kwargs)
 
 
 class MovieViewSet(RatingOrderedContentViewSet):

@@ -128,6 +128,15 @@ const Series = () => {
     setCurrentSerieId(serie.id);
   };
 
+  const handleDelete = (serieId) => {
+    axios.delete(`http://127.0.0.1:8000/series/${serieId}/`)
+      .then(() => {
+        setSeries(prev => prev.filter(p => p.id !== serieId));
+      })
+      .catch(error => {
+        console.error("Error deleting user:", error.response ? error.response.data : error);
+      });
+  };
 
   const getGenreNames = (genreIds) => {
     return genreIds.map(id => {
@@ -188,6 +197,9 @@ const Series = () => {
           <>
             <Button className="btn-round ml-1" color="info" type="button" onClick={() => handleEdit(serie)}>
               Editar
+            </Button>
+            <Button className="btn-round mr-1" color="danger" type="button" onClick={() => handleDelete(serie.id)}>
+              Eliminar
             </Button>
 
           </>
