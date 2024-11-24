@@ -3,6 +3,7 @@ import axios from 'axios';
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
 const Episodes = () => {
+  const [searchResults, setSearchResults] = useState([]);
   const [genres, setGenres] = useState([]);
   const [series, setSeries] = useState([]);
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const Episodes = () => {
     series_id: "",
   });
   const [isAdmin, setIsAdmin] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     document.title = "Episodes";
@@ -57,6 +59,16 @@ const Episodes = () => {
     setFormData({ ...formData, genre_ids: selectedGenres });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearch = () => {
+    axios.get(`http://127.0.0.1:8000/episodes/?search=${searchQuery}`)
+      .then(response => setSearchResults(response.data))
+      .catch(error => console.error("Error searching episodes:", error));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const method = 'post';
@@ -92,6 +104,39 @@ const Episodes = () => {
       });
   };
 
+
+
+  const getGenreNames = (genreIds) => {
+    return genreIds.map(id => {
+      const genre = genres.find(g => g.id === id);
+      return genre ? genre.name : "Unknown";
+    }).join(', ');
+  };
+
+  const getSeriesTitle = (seriesId) => {
+    const serie = series.find(s => s.id === seriesId);
+    return serie ? serie.title : 'Unknown';
+  };
+
+  const EpisodeCard = ({ episode }) => {
+    return (
+      <div key={episode.id} className="series-card">
+        <h3>{episode.title}</h3>
+        <p><strong>Description:</strong> {episode.description}</p>
+        <p><strong>Directors:</strong> {episode.directors}</p>
+        <p><strong>Duration:</strong> {episode.duration ? episode.duration + ' minutes' : 'N/A'}</p>
+        <p><strong>Genres:</strong> {getGenreNames(episode.genre_ids)}</p>
+        <p><strong>Main Actors:</strong> {episode.main_actors}</p>
+        <p><strong>Rating:</strong> {episode.rating}</p>
+        <p><strong>Release Date:</strong> {episode.release_date}</p>
+        <p><strong>Episode Number:</strong> {episode.episode_number}</p>
+        <p><strong>Season Number:</strong> {episode.season_number}</p>
+        <p><strong>Series Title:</strong> {getSeriesTitle(episode.series_id)}</p>
+        <p><strong>Thumbnail:</strong> <a href={episode.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+      </div>
+    );
+  };
+
   return (
     <>
       <IndexNavbar />
@@ -107,6 +152,17 @@ const Episodes = () => {
         }}>
         <div>
           <h1 style={{ fontWeight: "bold" , color: 'darkred'}}>Episodes</h1>
+          <h3>Search by title</h3>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search episode"
+          />
+          <button onClick={handleSearch}>Search</button>
+        </div>
+        <div className="series-container">
+          {searchResults.map(episode => <EpisodeCard key={episode.id} episode={episode} />)}
         </div>
 
         {isAdmin ? (
