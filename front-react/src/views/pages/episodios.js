@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
+// reactstrap components
+import {
+  Button,
+} from "reactstrap";
 
 const Episodes = () => {
   const [searchResults, setSearchResults] = useState([]);
@@ -119,6 +123,41 @@ const Episodes = () => {
   };
 
   const EpisodeCard = ({ episode }) => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const [watched, setWatched] = useState(false);
+
+    useEffect(() => {
+      if (user) {
+        axios.get(`http://127.0.0.1:8002/watched-episodes/?user_id=${user.id}&episode_id=${episode.id}`)
+          .then(response => {
+            setWatched(response.data.length > 0);
+          })
+          .catch(error => console.error("Error fetching watched status:", error));
+      }
+    }, [user, episode.id]);
+
+    const toggleWatchedStatus = () => {
+      const url = `http://127.0.0.1:8002/watched-episodes/`;
+      const method = watched ? 'delete' : 'post';
+      const data = watched ? {} : { user_id: user.id, episode_id: episode.id };
+
+      axios({
+        method,
+        url: watched ? `${url}?user_id=${user.id}&episode_id=${episode.id}` : url,
+        data,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      })
+        .then(() => {
+          setWatched(!watched);
+        })
+        .catch(error => {
+          console.error(`Error ${watched ? 'unmarking' : 'marking'} episode as watched:`, error.response ? error.response.data : error);
+        });
+    };
+
     return (
       <div key={episode.id} className="series-card">
         <h3>{episode.title}</h3>
@@ -133,6 +172,9 @@ const Episodes = () => {
         <p><strong>Season Number:</strong> {episode.season_number}</p>
         <p><strong>Series Title:</strong> {getSeriesTitle(episode.series_id)}</p>
         <p><strong>Thumbnail:</strong> <a href={episode.thumbnail_url} target="_blank" rel="noopener noreferrer">View Thumbnail</a></p>
+        <Button className="btn-round ml-1" color={watched ? "warning" : "success"} type="button" onClick={toggleWatchedStatus}>
+              {watched ? "Desmarcar episodio" : "Ver episodio"}
+        </Button>
       </div>
     );
   };
