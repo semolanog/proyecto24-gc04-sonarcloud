@@ -137,6 +137,27 @@ const Perfil = () => {
       });
   };
 
+  const handleDelete = (userId) => {
+    axios({
+      method: "delete",
+      url: `http://127.0.0.1:8001/users/${userId}/`,
+    })
+      .then(() => {
+        // Reload the list of users after deleting a user
+        axios({
+          method: "get",
+          url: 'http://127.0.0.1:8001/users/',
+        })
+          .then(response => {
+            setAllUsers(response.data);
+          })
+          .catch(error => console.error('Error fetching users:', error));
+      })
+      .catch((error) => {
+        console.error("Error deleting user:", error.response ? error.response.data : error);
+      });
+  };
+
 
   if (!user) return <div>Loading...</div>;
 
@@ -233,6 +254,7 @@ const Perfil = () => {
               {allUsers.map((u) => (
                 <li key={u.id}>
                   {u.name} ({u.email})
+                  <button onClick={() => handleDelete(u.id)}>Delete</button>
                 </li>
               ))}
             </ul>

@@ -21,7 +21,9 @@ urlpatterns = [
     ),
     path(
         "users/<int:id>/",
-        UserViewSet.as_view({"get": "retrieve", "put": "update"}),
+        UserViewSet.as_view({
+            "get": "retrieve", "put": "update", "delete": "destroy"
+        }),
         name="user-detail"
     )
 ]
