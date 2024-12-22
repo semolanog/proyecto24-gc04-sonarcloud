@@ -159,6 +159,7 @@
 
 .btn-group.select{
     width: 100%;
+    overflow: visible !important;
 }
 .btn-group.select .btn{
     text-align: left;
@@ -210,9 +211,7 @@
 .share-buttons .btn-outline-default{
     margin-top: 24px;
 }
-.btn-group.select{
-    overflow: visible !important;
-}
+
 .media{
     .media-body{
         .media-footer{
