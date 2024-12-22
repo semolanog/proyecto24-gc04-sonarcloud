@@ -1,4 +1,4 @@
-import React, {useEffect } from 'react';
+import React, {useEffect, useState  } from 'react';
 import axios from "axios";
 import {
   Button,
@@ -13,7 +13,6 @@ import {
   Col,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 function Registro() {
   const [formData, setFormData] = useState({

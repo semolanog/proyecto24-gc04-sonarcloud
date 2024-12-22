@@ -5,6 +5,7 @@ import django.db.models.deletion
 from decimal import Decimal
 from django.db import migrations, models
 
+CONTENT_DESCRIPTION_HELP_TEXT = 'The brief summary or synopsis of the content.'
 
 class Migration(migrations.Migration):
 
@@ -28,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Movie',
             fields=[
-                ('description', models.TextField(help_text='The brief summary or synopsis of the content.')),
+                ('description', models.TextField(help_text=CONTENT_DESCRIPTION_HELP_TEXT)),
                 ('directors', models.CharField(help_text='The name(s) of the director(s) of the content.', max_length=255)),
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('main_actors', models.CharField(help_text='The name(s) of the main actor(s) in the content.', max_length=255)),
@@ -47,7 +48,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Series',
             fields=[
-                ('description', models.TextField(help_text='The brief summary or synopsis of the content.')),
+                ('description', models.TextField(help_text=CONTENT_DESCRIPTION_HELP_TEXT)),
                 ('directors', models.CharField(help_text='The name(s) of the director(s) of the content.', max_length=255)),
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('main_actors', models.CharField(help_text='The name(s) of the main actor(s) in the content.', max_length=255)),
@@ -68,7 +69,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Episode',
             fields=[
-                ('description', models.TextField(help_text='The brief summary or synopsis of the content.')),
+                ('description', models.TextField(help_text=CONTENT_DESCRIPTION_HELP_TEXT)),
                 ('directors', models.CharField(help_text='The name(s) of the director(s) of the content.', max_length=255)),
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('main_actors', models.CharField(help_text='The name(s) of the main actor(s) in the content.', max_length=255)),
